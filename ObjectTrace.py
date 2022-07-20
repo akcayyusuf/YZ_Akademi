@@ -3,13 +3,13 @@ import cv2
 
 
 
-
+#Get frame number for specfied time
 def time2Frame(h=0,m=0,s=0,fr=30):
     frame = (h * 3600 + m * 60 + s) * fr
     return int(frame)
 
 
-#Video file
+#Get Video file
 vid = cv2.VideoCapture("bolt.mp4")
 
 #Create Trackers
@@ -21,17 +21,18 @@ MEDIANFLOW=cv2.legacy.TrackerMedianFlow_create()
 MOSSE=cv2.legacy.TrackerMOSSE_create()
 CSRT=cv2.TrackerCSRT_create()
 
+#First and Last Frame
 startFrame=time2Frame(0,0,2,vid.get(cv2.CAP_PROP_FPS))
 vid.set(1,startFrame)
 endFrame=time2Frame(0,0,18,vid.get(cv2.CAP_PROP_FPS))
-
-
 ret,frame =vid.read()
+
+#Mark UseinBolt
 box =(444, 220, 39, 83)
 
 
 
-
+#Initial Settings for different trace algorithms
 BOOSTING.init(frame, box)
 MIL.init(frame, box)
 KCF.init(frame, box)
@@ -40,6 +41,7 @@ MEDIANFLOW.init(frame, box)
 MOSSE.init(frame,box)
 CSRT.init(frame, box)
 
+#Counter for end frame
 count=0
 while True:
 
@@ -119,7 +121,6 @@ while True:
         # Tracking failure
         cv2.putText(frame, "[MOSSE]Tracking failure detected", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (220,60, 227), 2)
 
-
     if okCSRT:
         # Tracking success
         p1 = (int(boxCSRT[0]), int(boxCSRT[1]))
@@ -128,10 +129,6 @@ while True:
     else:
         # Tracking failure
         cv2.putText(frame, "Tracking failure detected", (100, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
-
-
-
-
 
 
     # Display tracker type on frame
@@ -144,19 +141,14 @@ while True:
     cv2.putText(frame, "CSRT", (10, 450), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 255, 0), 2);
 
 
-
-
-
     # Display FPS on frame
     cv2.putText(frame, "FPS : " + str(int(fps)), (10, 24), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2);
 
     # Display result
     cv2.imshow("Tracking", frame)
 
-
-
     count+=1
-    # Exit if ESC pressed
+
     k = cv2.waitKey(1) & 0xff
     if k == 27 or count==endFrame:
         break
